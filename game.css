@@ -1,0 +1,138 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font: 11px Helvetica;
+  background: #fff;
+}
+canvas {
+  border: 1px solid #ccc;
+}
+button {
+  border: 0px;
+  background: #9a70ff;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 20px;
+  padding: 3px 9px 4px;
+  text-transform: uppercase;
+  outline: none;
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+.row {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+.field {
+  position: relative;
+  margin: 5px;
+  padding: 1em 1em 0.5em;
+  border: 1px solid #eee;
+}
+.field > .field {
+  background: #eee;
+}
+.field > label {
+  position: absolute;
+  top: -0.5em;
+  padding: 0px 10px;
+  background-color: #fff;
+}
+#wrapper {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  box-shadow: inset 0 0 0 5px #aaf;
+  box-sizing: border-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  padding: 5px;
+  -webkit-flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  position: relative;
+}
+#header {
+  position: relative;
+  height: 20px;
+  margin: 0px;
+  background: rgba(0,0,0,0.5);
+  padding: 10px 15px 7px;
+  color: #fff;
+  z-index: 1;
+  box-shadow: 0px 0px 2px rgba(0,0,0,0.5);
+  -webkit-flex-shrink: 0;
+      -ms-flex-negative: 0;
+          flex-shrink: 0;
+}
+#contents {
+  -webkit-flex: 1 1 55%;
+      -ms-flex: 1 1 55%;
+          flex: 1 1 55%;
+  overflow: auto;
+  padding: 0px 10px;
+}
+#log {
+  position: relative;
+  z-index: 1;
+  -webkit-flex: 1 1 45%;
+      -ms-flex: 1 1 45%;
+          flex: 1 1 45%;
+  box-shadow: 0px 0px 5px rgba(0,0,0,0.5);
+  width: 100%;
+  overflow: auto;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+  border-top: 1px solid #222;
+  background: #000;
+  color: #eee;
+  padding: 2px 0px;
+  font-weight: bold;
+}
+#log div {
+  padding: 1px 5px;
+}
+#log div:nth-child(even) {
+  background-color: #222;
+}
+#log div:nth-child(odd) {
+  background-color: #000;
+}
+.corner {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  pointer-events: none;
+  border: 2px solid #f00;
+}
+#cornerNW {
+  border-width: 2px 0px 0px 2px;
+  top: 0;
+  left: 0;
+}
+#cornerNE {
+  border-width: 2px 2px 0px 0px;
+  top: 0;
+  right: 0;
+}
+#cornerSW {
+  border-width: 0px 2px 2px 0px;
+  bottom: 0;
+  right: 0;
+}
+#cornerSE {
+  border-width: 0px 0px 2px 2px;
+  bottom: 0;
+  left: 0;
+}
+
