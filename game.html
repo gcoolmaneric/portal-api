@@ -186,29 +186,6 @@ location.hash
 // hash.id is the App Id
 RGames.init(hash.id);
 
-// Event
-//event medals callback function
-RGames.on('medals', isGuest => {
-  console.log('medal_callback';
-  // refresh medal count
-  if (!isGuest) {
-    RGames.getMedals()
-      .catch(err => {
-        console.warn('unable to update medal count', err);
-      });
-  }
-});
-
-// event authStatus callback function
-RGames.on('authStatus', isGuest => {
-  console.log('authStatus_callback';
-  // refresh medal count
-  if (!isGuest) {
-    RGames.getAuthStatus();
-  }
-});
-
-
 function pad(val) {
   return ('               ' + val).slice(-15);
 }
