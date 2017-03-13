@@ -182,7 +182,27 @@ location.hash
     hash[piece[0]] = piece[1];
   });
 
+// Initial RGames API to get the access token.
+// hash.id is the App Id
 RGames.init(hash.id);
+
+// Event
+//event medals callback function
+var medal_callback = function medal_callback()
+{
+  console.log('medal_callback get medals: ' + RGames.getMedals() );
+}
+// initial event medals
+RGames.on('medals', medal_callback);
+
+// event authStatus
+var auth_callback = function auth_callback()
+{
+  console.log('auth_callback getAuthStatus' + RGames.getAuthStatus() );
+}
+
+RGames.on('authStatus', auth_callback);
+
 
 function pad(val) {
   return ('               ' + val).slice(-15);
