@@ -68,25 +68,6 @@
       </div>
     </div>
     <div class="field">
-      <label>replay V1</label>
-      <canvas id="draw" width="400" height="400"></canvas>
-      <button onclick="uploadReplay()">Upload replay</button>
-      <button onclick="postReplay()">post replay</button>
-      <button onclick="newReplay()">new game</button>
-
-      <div class="field">
-        <input type="text" id="replayId" placeholder="replay id">
-        <button onclick="RGames.getReplayMetadata(document.querySelector('#replayId').value)">replay metadata</button>
-        <button onclick="playReplay(document.querySelector('#replayId').value)">play replay</button>
-        <button onclick="RGames.likeReplay(document.querySelector('#replayId').value, true)">like replay</button>
-        <button onclick="RGames.likeReplay(document.querySelector('#replayId').value, false)">unlike replay</button>
-        <button onclick="RGames.isReplayLiked(document.querySelector('#replayId').value)">is replay liked</button>
-        <button onclick="RGames.favoriteReplay(document.querySelector('#replayId').value, true)">favorite replay</button>
-        <button onclick="RGames.favoriteReplay(document.querySelector('#replayId').value, false)">unfavorite replay</button>
-        <button onclick="RGames.getFavoriteReplays()">get favorites</button>
-      </div>
-    </div>
-    <div class="field">
       <label>portal</label>
       <button onclick="RGames.navigateToPortal()">navigate to portal</button>
       <button onclick="RGames.trackGeneralEvent({
@@ -238,13 +219,15 @@ function getMedalStoreItems() {
   var store = document.querySelector('#store');
   return RGames.getMedalStoreItems()
     .then(function (res) {
-      store.innerHTML = '';
-      Object.keys(res).forEach(function (id) {
-        var item = res[id];
-        var b = store.appendChild(document.createElement('button'));
-        b.onclick = function () { RGames.buyMedals(id); };
-        b.innerText = 'buy ' + item.medals + ' medals (' + item.freeMedals + ' free!) for ¥' + item.price;
-      });
+      if (res.status === 200) {
+        store.innerHTML = '';
+        Object.keys(res.data).forEach(function (id) {
+          var item = res.data[id];
+          var b = store.appendChild(document.createElement('button'));
+          b.onclick = function () { RGames.buyMedals(id); };
+          b.innerText = 'buy ' + item.medals + ' medals (' + item.freeMedals + ' free!) for ¥' + item.price;
+        });
+      }
       return res;
     });
 }
