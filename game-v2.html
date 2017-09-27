@@ -44,12 +44,18 @@
       <button onclick="RGames.loginPlayFab(document.querySelector('#userId').value)">Login PlayFab</button>
       <div></div>
       <input type="text" id="name" placeholder="Input Function Name">
-      <input type="text" id="version" placeholder="Input Category Version">
-      <input type="text" id="tableId" placeholder="Input Table Id">
-      <button onclick="RGames.executePlayFabCloudScript(document.querySelector('#name').value, document.querySelector('#version').value, document.querySelector('#tableId').value)">Execute Cloud Script</button>
+      <div></div>
+      <div>
+        <textarea id="parameters" rows="10" cols="50">
+{
+  "itemId": "LeoWeapon"
+}
+        </textarea>
+      </div>
+      <button onclick="runPlayFabCloudScript()">Execute Cloud Script</button>
     </div>
     <div class="field">
-      <label>replay V2</label>
+      <label>Replay V2</label>
       <canvas id="draw" width="400" height="400"></canvas>
       <button onclick="uploadReplayV2()">Upload replay</button>
       <button onclick="postReplayV2()">post replay</button>
@@ -65,6 +71,7 @@
         <button onclick="RGames.favoriteReplay(document.querySelector('#replayId').value, true)">favorite replay</button>
         <button onclick="RGames.favoriteReplay(document.querySelector('#replayId').value, false)">unfavorite replay</button>
         <button onclick="RGames.getFavoriteReplays()">get favorites</button>
+        <button onclick="RGames.viewReplay(document.querySelector('#replayId').value,)">view replay</button>
       </div>
     </div>
     <div class="field">
@@ -215,6 +222,13 @@ function initPlayFab(titleId, developerKey) {
   return RGames.initPlayFab(titleId, developerKey);
 }
 
+function runPlayFabCloudScript() {
+  var parameters = JSON.parse(document.querySelector('#parameters').value);
+  var functionName = document.querySelector('#name').value;
+
+  return RGames.executePlayFabCloudScript(functionName, parameters, 'live', true);
+}
+
 function getMedalStoreItems() {
   var store = document.querySelector('#store');
   return RGames.getMedalStoreItems()
@@ -259,20 +273,6 @@ function uploadReplay() {
     });
 }
 
-function postReplay() {
-  if (!replay) {
-    return alert('draw something first before posting!');
-  }
-
-  replay
-    .then(function (response) {
-        // for easy replay testing, put the replay id in the replay field
-        document.querySelector('#replayId').value = response.data.replay_id;
-        // share with the portal!
-        return RGames.postReplay(response.data.replay_id);
-    });
-}
-
 function postReplayV2() {
   if (!replay) {
     return alert('draw something first before posting!');
@@ -293,15 +293,6 @@ function newReplay() {
   replay = null;
   replayData = null;
   canvas.width = canvas.width;
-}
-
-function playReplay(replayId) {
-  return RGames.getReplay(replayId)
-    .then(function (response) {
-      if (response.status === 200) {
-        replayDrawing(response.data.trace);
-      }
-    });
 }
 
 function playReplay(replayId) {
