@@ -3,7 +3,7 @@
 <title>RGames Test Game</title>
 <meta charset="UTF-8">
 <link rel="stylesheet" href="game.css">
-<script src="https://cdn.rgames.jp/api/2/rgames.js"></script>
+<script src="//dev.rgames.jp/cdn/api/1/rgames.js"></script>
 </head>
 <body>
 <div id="wrapper">
@@ -15,7 +15,10 @@
   <div id="contents">
     <div class="field row">
       <div class="field">
-        <button onclick="RGames.getWeeklyLadder()">get weekly ladder</button>
+        <input type="text" id="leaderboardName" value="ScoreWeekly">
+        <input type="text" id="totalCount" value=20>
+        <input type="text" id="startPosition" value=0>
+        <button onclick="RGames.getLeaderboard(document.querySelector('#leaderboardName').value, document.querySelector('#totalCount').value, document.querySelector('#startPosition').value)">get weekly ladder</button>
         <button onclick="RGames.getFriends()">get friends</button>
       </div>
     </div>
@@ -233,16 +236,17 @@ function getMedalStoreItems() {
   var store = document.querySelector('#store');
   return RGames.getMedalStoreItems()
     .then(function (res) {
-      if (res.status === 200) {
-        store.innerHTML = '';
-        Object.keys(res.data).forEach(function (id) {
-          var item = res.data[id];
-          var b = store.appendChild(document.createElement('button'));
-          b.onclick = function () { RGames.buyMedals(id); };
-          b.innerText = 'buy ' + item.medals + ' medals (' + item.freeMedals + ' free!) for ¥' + item.price;
-        });
-      }
+      store.innerHTML = '';
+      Object.keys(res.data).forEach(function (id) {
+        var item = res.data[id];
+        var b = store.appendChild(document.createElement('button'));
+        b.onclick = function () { RGames.buyMedals(id); };
+        b.innerText = 'buy ' + item.medals + ' medals (' + item.freeMedals + ' free!) for ¥' + item.price;
+      });
       return res;
+    })
+   .catch((err) => {
+      console.error(err);
     });
 }
 
@@ -256,9 +260,10 @@ function uploadReplayV2() {
 
   replay
     .then(function (response) {
-      if (response.status === 200) {
-        return RGames.uploadReplayData(response.data.replay_id, Math.random() * 10000,replayData);
-      }
+      return RGames.uploadReplayData(response.data.replay_id, Math.random() * 10000,replayData);
+    })
+    .catch((err) => {
+      console.error(err);
     });
 }
 
@@ -280,12 +285,13 @@ function postReplayV2() {
 
   replay
     .then(function (response) {
-      if (response.status === 200) {
         // for easy replay testing, put the replay id in the replay field
         document.querySelector('#replayId').value = response.data.replay_id;
         // share with the portal!
         return RGames.postReplay(response.data.replay_id);
-      }
+    })
+    .catch((err) => {
+      console.error(err);
     });
 }
 
@@ -298,9 +304,10 @@ function newReplay() {
 function playReplay(replayId) {
   return RGames.getReplay(replayId)
     .then(function (response) {
-      if (response.status === 200) {
         replayDrawing(response.data.trace);
-      }
+    })
+    .catch((err) => {
+      console.error(err);
     });
 }
 
@@ -409,8 +416,6 @@ window.addEventListener('touchup', onUp);
 </script>
 <script>
 function onResize() {
-  log('resize', window.innerWidth + 'x' + window.innerHeight);
-
   var wrapper = document.getElementById('wrapper');
   wrapper.style.height = window.innerHeight + 'px';
   wrapper.style.width = window.innerWidth + 'px';
