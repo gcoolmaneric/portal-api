@@ -217,7 +217,7 @@ location.hash
 RGames.init(hash.id);
 
 function getWeeklyLadder() {
-  return RGames.getWeeklyLadder(hash.id, document.querySelector('#startPosition').value, document.querySelector('#totalCount').value)
+  return RGames.getWeeklyLadder(document.querySelector('#startPosition').value, document.querySelector('#totalCount').value)
 }
 
 function pad(val) {
