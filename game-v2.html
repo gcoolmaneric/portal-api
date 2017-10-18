@@ -15,10 +15,9 @@
   <div id="contents">
     <div class="field row">
       <div class="field">
-        <input type="text" id="leaderboardName" value="ScoreWeekly">
-        <input type="text" id="totalCount" value=20>
-        <input type="text" id="startPosition" value=0>
-        <button onclick="RGames.getLeaderboard(document.querySelector('#leaderboardName').value, document.querySelector('#totalCount').value, document.querySelector('#startPosition').value)">get weekly ladder</button>
+        <input type="text" id="totalCount" value=20 placeholder="Result Count">
+        <input type="text" id="startPosition" value=0 placeholder="Start Position">
+        <button onclick="getWeeklyLadder()">get weekly ladder</button>
         <button onclick="RGames.getFriends()">get friends</button>
       </div>
     </div>
@@ -216,6 +215,10 @@ location.hash
   });
 
 RGames.init(hash.id);
+
+function getWeeklyLadder() {
+  return RGames.getWeeklyLadder(hash.id, document.querySelector('#startPosition').value, document.querySelector('#totalCount').value)
+}
 
 function pad(val) {
   return ('               ' + val).slice(-15);
