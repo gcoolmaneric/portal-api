@@ -3,7 +3,7 @@
 <title>RGames Test Game</title>
 <meta charset="UTF-8">
 <link rel="stylesheet" href="game.css">
-<script src="https://cdn.rgames.jp/api/2/rgames.js"></script>
+<script src="//dev.rgames.jp/cdn/api/2/rgames.js"></script>
 </head>
 <body>
 <div id="wrapper">
@@ -19,6 +19,7 @@
         <input type="text" id="startPosition" value=0 placeholder="Start Position">
         <button onclick="getWeeklyLadder()">get weekly ladder</button>
         <button onclick="RGames.getFriends()">get friends</button>
+        <button onclick="getUnplayFriends()">Unplay friends</button>
       </div>
     </div>
     <div class="field">
@@ -218,6 +219,10 @@ RGames.init(hash.id);
 
 function getWeeklyLadder() {
   return RGames.getWeeklyLadder(document.querySelector('#startPosition').value, document.querySelector('#totalCount').value)
+}
+
+function getUnplayFriends() {
+  return RGames.getUnplayFriends()
 }
 
 function pad(val) {
