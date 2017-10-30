@@ -1,0 +1,442 @@
+<!doctype html>
+<head>
+<title>RGames Test Game</title>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="game.css">
+<script src="https://cdn.rgames.jp/api/2/rgames.js"></script>
+</head>
+<body>
+<div id="wrapper">
+  <div id="cornerNW" class="corner"></div>
+  <div id="cornerNE" class="corner"></div>
+  <div id="cornerSW" class="corner"></div>
+  <div id="cornerSE" class="corner"></div>
+  <h2 id="header">Test Game</h2>
+  <div id="contents">
+    <div class="field row">
+      <div class="field">
+        <input type="text" id="totalCount" value=20 placeholder="Result Count">
+        <input type="text" id="startPosition" value=0 placeholder="Start Position">
+        <button onclick="getWeeklyLadder()">get weekly ladder</button>
+        <button onclick="RGames.getFriends()">get friends</button>
+        <button onclick="getUnplayFriends()">unplay friends</button>
+        <input type="text" id="friendIds" value=0 placeholder="['friend_id']">
+        <button onclick="inviteFriends()">invite friends</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>medals</label>
+      <button onclick="RGames.getMedals()">get medals</button>
+      <button onclick="getMedalStoreItems()">get medal store items</button>
+      <div class="field" id="store"></div>
+      <input type="text" id="gameItem" value="extra_lives">
+      <button onclick="RGames.buyGameItem(document.querySelector('#gameItem').value)">buy game item</button>
+    </div>
+    <div class="field">
+      <label>auth</label>
+      <button onclick="RGames.getAuthStatus()">get auth status</button>
+      <button onclick="RGames.getProfile()">get user's profile</button>
+      <button onclick="RGames.login()">login</button>
+      <button onclick="RGames.logout()">logout</button>
+    </div>
+    <div class="field">
+      <label>PlayFab</label>
+      <input type="text" id="titleId" placeholder="Input TitleId">
+      <input type="text" id="devKey" placeholder="Input Developer Key">
+      <button onclick="initPlayFab(document.querySelector('#titleId').value, document.querySelector('#devKey').value)">Initial PlayFab</button>
+      <div></div>
+      <input type="text" id="userId" placeholder="Input User Id">
+      <button onclick="RGames.loginPlayFab(document.querySelector('#userId').value)">Login PlayFab</button>
+      <div></div>
+      <input type="text" id="name" placeholder="Input Function Name">
+      <div></div>
+      <div>
+        <textarea id="parameters" rows="10" cols="50">
+{
+  "itemId": "LeoWeapon"
+}
+        </textarea>
+      </div>
+      <button onclick="runPlayFabCloudScript()">Execute Cloud Script</button>
+    </div>
+    <div class="field">
+      <label>Replay V2</label>
+      <canvas id="draw" width="400" height="400"></canvas>
+      <button onclick="uploadReplayV2()">Upload replay</button>
+      <button onclick="postReplayV2()">post replay</button>
+      <button onclick="newReplay()">new game</button>
+
+      <div class="field">
+        <input type="text" id="replayId" placeholder="replay id">
+        <button onclick="RGames.getReplayMetadata(document.querySelector('#replayId').value)">replay metadata</button>
+        <button onclick="playReplay(document.querySelector('#replayId').value)">play replay</button>
+        <button onclick="RGames.likeReplay(document.querySelector('#replayId').value, true)">like replay</button>
+        <button onclick="RGames.likeReplay(document.querySelector('#replayId').value, false)">unlike replay</button>
+        <button onclick="RGames.isReplayLiked(document.querySelector('#replayId').value)">is replay liked</button>
+        <button onclick="RGames.favoriteReplay(document.querySelector('#replayId').value, true)">favorite replay</button>
+        <button onclick="RGames.favoriteReplay(document.querySelector('#replayId').value, false)">unfavorite replay</button>
+        <button onclick="RGames.getFavoriteReplays()">get favorites</button>
+        <button onclick="RGames.viewReplay(document.querySelector('#replayId').value,)">view replay</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>portal</label>
+      <button onclick="RGames.navigateToPortal()">navigate to portal</button>
+      <button onclick="RGames.trackGeneralEvent({
+        category: 'Event Category',
+        action: 'Event Action',
+        label: 'Event Label',
+        value: 100
+        })">track event</button>
+      <button onclick="RGames.trackVirtualPageView({
+        page: '/v/virtual-page-view',
+        title: 'Virtual Page View'
+        })">track virtual page view</button>
+      <button onclick="RGames.initialLoadComplete()">track game initial load complete</button>
+      <button onclick="RGames.gameplayStart()">track game play start</button>
+      <button onclick="RGames.gameplayEnd()">track game play end</button>
+    </div>
+  </div>
+  <pre id="log"></pre>
+</div>
+<script>
+/* globals RGames */
+
+;(function () {
+  var line;
+  var span;
+  var buffer = [];
+  function nextLine() { line = logEl.appendChild(document.createElement('div')); }
+  function nextSpan() {
+    flush();
+    span = line.appendChild(document.createElement('span'));
+  }
+
+  function flush() {
+    if (span) {
+      span.innerText = buffer.join(' ') + ' ';
+      buffer = [];
+      span = null;
+    }
+  }
+
+  window.log = function() {
+    nextLine();
+    nextSpan();
+
+    Array.from(arguments).forEach(function (piece) {
+      if (typeof piece === 'string') {
+        buffer.push(piece);
+      } else {
+        flush();
+        nextSpan();
+        for (var key in piece) {
+          span.style[key] = piece[key];
+        }
+      }
+    });
+
+    flush();
+    scrollLogToBottom();
+  };
+
+  var scrollTop = 0;
+  var scrollTarget = 0;
+  var autoScroll = true;
+  var logEl = document.querySelector('#log');
+
+  window.scrollLogToBottom = function() {
+    scrollTop = logEl.scrollTop;
+    scrollTarget = logEl.scrollHeight - logEl.offsetHeight;
+    requestAnimationFrame(_scrollLog);
+  };
+
+  function _scrollLog() {
+    if (!autoScroll) { return; }
+    if (logEl.scrollTop !== scrollTarget) {
+      var direction = scrollTarget > logEl.scrollTop ? 1 : -1;
+      var delta = Math.max(0.2, Math.min(Math.abs(scrollTarget - logEl.scrollTop) / 15, 100));
+      scrollTop += delta * direction; // float
+      logEl.scrollTop = scrollTop; // int
+      requestAnimationFrame(_scrollLog);
+    }
+  }
+})();
+
+
+wrap(RGames);
+
+var timeStyle = {color: '#a5d5fe'};
+var prefixStyle = {color: '#fffdc3'};
+var normalStyle = {color: 'white'};
+var apiStyle = {color: '#b4fb73'};
+var errorStyle = {color: '#ff8373'};
+var jsonStyle = {color: '#8f8f8f'};
+
+function wrap(api) {
+  Object.getOwnPropertyNames(Object.getPrototypeOf(api)).forEach(function (name) {
+    var original = api[name];
+    if (typeof original !== 'function') { return; }
+
+    api[name] = function () {
+      var prefix = '[' + name + ']';
+      var args = Array.from(arguments);
+      var start = Date.now();
+      var logWithPrefix = function () {
+        window.log.apply(window, [timeStyle, pad(start), prefixStyle, prefix, normalStyle].concat(Array.from(arguments)));
+      };
+
+      logWithPrefix('calling', apiStyle, 'RGames.' + name + '(' + args
+        .map(function (arg) { return JSON.stringify(arg); })
+        .join(', ') + ')');
+
+      var res = original.apply(this, args);
+
+      res
+        .then(function (res) {
+          logWithPrefix('<--', jsonStyle, JSON.stringify(res));
+        })
+        .catch(function (e) {
+          console.error(e);
+          logWithPrefix('error:', errorStyle, e.stack || JSON.stringify(e));
+        });
+
+      return res;
+    };
+  });
+}
+
+var hash = {};
+location.hash
+  .replace(/^#/, '')
+  .split('&')
+  .forEach(function (piece) {
+    var piece = piece
+      .split('=')
+      .map(function (piece) { return decodeURIComponent(piece); });
+    hash[piece[0]] = piece[1];
+  });
+
+RGames.init(hash.id);
+
+function inviteFriends() {
+  return RGames.inviteFriends([4575954265440256])
+}
+
+function getWeeklyLadder() {
+  return RGames.getWeeklyLadder(document.querySelector('#startPosition').value, document.querySelector('#totalCount').value)
+}
+
+function getUnplayFriends() {
+  return RGames.getUnplayFriends()
+}
+
+function pad(val) {
+  return ('               ' + val).slice(-15);
+}
+
+function initPlayFab(titleId, developerKey) {
+  return RGames.initPlayFab(titleId, developerKey);
+}
+
+function runPlayFabCloudScript() {
+  var parameters = JSON.parse(document.querySelector('#parameters').value);
+  var functionName = document.querySelector('#name').value;
+
+  return RGames.executePlayFabCloudScript(functionName, parameters, 'live', true);
+}
+
+function getMedalStoreItems() {
+  var store = document.querySelector('#store');
+  return RGames.getMedalStoreItems()
+    .then(function (res) {
+      store.innerHTML = '';
+      Object.keys(res.data).forEach(function (id) {
+        var item = res.data[id];
+        var b = store.appendChild(document.createElement('button'));
+        b.onclick = function () { RGames.buyMedals(id); };
+        b.innerText = 'buy ' + item.medals + ' medals (' + item.freeMedals + ' free!) for ¥' + item.price;
+      });
+      return res;
+    })
+   .catch((err) => {
+      console.error(err);
+    });
+}
+
+var replayData = null;
+var replay = null;
+
+function uploadReplayV2() {
+  if (!replay) {
+    return alert('draw something first before posting!');
+  }
+
+  replay
+    .then(function (response) {
+      return RGames.uploadReplayData(response.data.replay_id, Math.random() * 10000,replayData);
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+}
+
+function uploadReplay() {
+  if (!replay) {
+    return alert('draw something first before posting!');
+  }
+
+  replay
+    .then(function (response) {
+      return RGames.uploadReplayData(response.data.replay_id, Math.random() * 10000,replayData);
+    });
+}
+
+function postReplayV2() {
+  if (!replay) {
+    return alert('draw something first before posting!');
+  }
+
+  replay
+    .then(function (response) {
+        // for easy replay testing, put the replay id in the replay field
+        document.querySelector('#replayId').value = response.data.replay_id;
+        // share with the portal!
+        return RGames.postReplay(response.data.replay_id);
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+}
+
+function newReplay() {
+  replay = null;
+  replayData = null;
+  canvas.width = canvas.width;
+}
+
+function playReplay(replayId) {
+  return RGames.getReplay(replayId)
+    .then(function (response) {
+        replayDrawing(response.data.trace);
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+}
+
+var canvas = document.querySelector('#draw');
+var context = canvas.getContext('2d');
+var lastX, lastY;
+var isDown;
+var stroke = false;
+
+function onDown() { isDown = true; }
+function onUp() { isDown = false; }
+
+function onEvent(evt) {
+  var offset = canvas.getBoundingClientRect();
+  var x = evt.clientX - offset.left;
+  var y = evt.clientY - offset.top;
+  if (lastX && lastY && isDown) {
+    if (!replay) {
+      replay = RGames.createReplay();
+      replayData = [];
+    }
+
+    if (!stroke) {
+      replayData.push('S', lastX, lastY, x, y);
+    } else {
+      replayData.push(x, y);
+    }
+
+    context.beginPath();
+    context.moveTo(lastX, lastY);
+    context.lineTo(x, y);
+    context.stroke();
+  }
+
+  lastX = x;
+  lastY = y;
+}
+
+function replayDrawing(data) {
+  // clear
+  canvas.width = canvas.width;
+
+  var index = 0;
+  var n = data.length;
+  var lastX, lastY;
+  function drawNext() {
+    if (data[index] === 'S') {
+      lastX = data[++index];
+      lastY = data[++index];
+      ++index;
+    }
+
+    context.beginPath();
+    context.moveTo(lastX, lastY);
+    lastX = data[index];
+    lastY = data[++index];
+    context.lineTo(lastX, lastY);
+    context.stroke();
+
+    if (++index < n) {
+      requestAnimationFrame(drawNext);
+    }
+  }
+
+  requestAnimationFrame(drawNext);
+}
+
+function unlockAchievement(id) {
+  var completed = {};
+
+  completed[id] = true;
+
+  RGames.updateAchievements({
+    events_object: {
+      events: [
+        {
+          event_type: 'default_achievements',
+          completed: completed
+        }
+      ]
+    }
+  });
+}
+
+function lockAchievement(id) {
+  var remove = [id];
+
+  RGames.updateAchievements({
+    events_object: {
+      events: [
+        {
+          event_type: 'default_achievements',
+          remove_achievements: remove
+        }
+      ]
+    }
+  });
+}
+
+canvas.addEventListener('mousedown', onDown);
+canvas.addEventListener('touchdown', onDown);
+window.addEventListener('mousemove', onEvent);
+window.addEventListener('touchmove', onEvent);
+window.addEventListener('mouseup', onUp);
+window.addEventListener('touchup', onUp);
+</script>
+<script>
+function onResize() {
+  var wrapper = document.getElementById('wrapper');
+  wrapper.style.height = window.innerHeight + 'px';
+  wrapper.style.width = window.innerWidth + 'px';
+}
+
+window.addEventListener('resize', onResize);
+onResize();
+setTimeout(onResize, 1000);
+</script>
+</body>
