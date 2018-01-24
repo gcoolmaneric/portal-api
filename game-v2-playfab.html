@@ -38,6 +38,26 @@
       <button onclick="RGames.logout()">logout</button>
     </div>
     <div class="field">
+      <label>PlayFab</label>
+      <input type="text" id="titleId" placeholder="Input TitleId">
+      <input type="text" id="devKey" placeholder="Input Developer Key">
+      <button onclick="initPlayFab(document.querySelector('#titleId').value, document.querySelector('#devKey').value)">Initial PlayFab</button>
+      <div></div>
+      <input type="text" id="userId" placeholder="Input User Id">
+      <button onclick="RGames.loginPlayFab(document.querySelector('#userId').value)">Login PlayFab</button>
+      <div></div>
+      <input type="text" id="name" placeholder="Input Function Name">
+      <div></div>
+      <div>
+        <textarea id="parameters" rows="10" cols="50">
+{
+  "itemId": "LeoWeapon"
+}
+        </textarea>
+      </div>
+      <button onclick="runPlayFabCloudScript()">Execute Cloud Script</button>
+    </div>
+    <div class="field">
       <label>Replay V2</label>
       <canvas id="draw" width="400" height="400"></canvas>
       <button onclick="uploadReplayV2()">Upload replay</button>
